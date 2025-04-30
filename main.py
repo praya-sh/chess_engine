@@ -3,7 +3,7 @@ import chessengine
 
 width = height = 512
 Dimension = 8
-SQ_SIZE = height/Dimension
+SQ_SIZE = height//Dimension
 max_fps = 15
 images = {}
 
@@ -23,13 +23,35 @@ def main():
     gs = chessengine.GameState()
     loadImages()
     running = True
+    sqSelected = ()     #no square selected initially
+    playerClicks = []   #keep track of player clicks. [(6,2),(4,4)]
     while running:
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
-            drawGameState(screen,gs)
-            clock.tick(max_fps)
-            p.display.flip()
+            elif e.type == p.MOUSEBUTTONDOWN:
+                location = p.mouse.get_pos()
+                #print(location)
+                col = location[0]//SQ_SIZE
+                row = location[1]//SQ_SIZE
+                if sqSelected == (row, col):    #select the same square twice(unselect)
+                    sqSelected = ()
+                    playerClicks = []
+                else:
+                    sqSelected = (row,col)
+                    playerClicks.append(sqSelected) #append for first and second clicks
+                if len(playerClicks) == 2:
+                    move = chessengine.Move(playerClicks[0], playerClicks[1], gs.board)
+                    print(move.getChessNotation())
+                    gs.makeMove(move)
+                    sqSelected = ()
+                    playerClicks = []
+
+
+
+        drawGameState(screen,gs)
+        clock.tick(max_fps)
+        p.display.flip()
 
 def drawGameState(screen,gs):
     drawBoard(screen)
