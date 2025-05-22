@@ -45,10 +45,10 @@ def main():
                     playerClicks.append(sqSelected) #append for first and second clicks
                 if len(playerClicks) == 2:
                     move = chessengine.Move(playerClicks[0], playerClicks[1], gs.board)
-                    print(move.getChessNotation())
+                    #print(move.getChessNotation())
                     if move in validMoves:
                         gs.makeMove(move)   
-                        movemade = True
+                        moveMade = True
 
                     sqSelected = ()
                     playerClicks = []
