@@ -1,14 +1,14 @@
 class GameState():
     def __init__(self):
         self.board = [
-            ["bR","bN","bB","bQ","bK","bB","bN","bR" ],
-            ["bp","bp","bp","bp","bp","bp","bp","bp" ],
+            ["bR","bN","bB","--","bK","bB","bN","bR" ],
+            ["bp","bp","bp","--","bp","bp","bp","bp" ],
+            ["--","--","--","wR","bR","--","--","--" ],
             ["--","--","--","--","--","--","--","--" ],
+            ["--","--","--","wR","--","--","bR","--" ],
             ["--","--","--","--","--","--","--","--" ],
-            ["--","--","--","--","--","--","--","--" ],
-            ["--","--","--","--","--","--","--","--" ],
-            ["wp","wp","wp","wp","wp","wp","wp","wp" ],
-            ["wR","wN","wB","wQ","wK","wB","wN","wR" ]
+            ["wp","wp","wp","--","wp","wp","wp","wp" ],
+            ["wR","wN","wB","--","wK","wB","wN","wR" ]
         ]
         self.moveFunctions = {'p':self.getPawnMoves, 'R':self.getRookMoves
                               ,'N': self.getKnightMoves, 'B': self.getBishopMoves, 'Q':self.getQueenMoves,
@@ -43,10 +43,8 @@ class GameState():
                     self.moveFunctions[piece](r,c,moves) #gets function from dictionary
         return moves
                     
-
     def getPawnMoves(self, r, c, moves):
-        if self.whiteToMove:
-            
+        if self.whiteToMove:          
             if self.board[r-1][c] == "--":
                 moves.append(Move((r,c), (r-1, c), self.board))
                 if r == 6 and self.board[r-2][c] == "--":
@@ -59,7 +57,6 @@ class GameState():
                     moves.append(Move((r,c), (r-1,c+1), self.board))
 
         if not self.whiteToMove:
-            
             if self.board[r+1][c] == "--":
                 moves.append(Move((r,c), (r+1, c), self.board))
                 if r == 1 and self.board[r+2][c] == "--":
@@ -75,11 +72,35 @@ class GameState():
 
 
     def getRookMoves(self, r, c, moves):
-        pass
+
+        if self.whiteToMove:
+            ally, enemy = 'w', 'b'
+        else:
+            ally, enemy = 'b', 'w'
+
+        # 2) four straight‐line directions: down, up, right, left
+        directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+        
+        for dr, dc in directions:
+            for i in range(1, 8):
+                end_row, end_col = r + dr*i, c + dc*i
+                # check if still on board
+                if not (0 <= end_row < 8 and 0 <= end_col < 8):
+                    break
+                
+                if self.board[end_row][end_col] == "--":
+                    # empty square: legal move, keep going
+                    moves.append(Move((r, c), (end_row, end_col), self.board))
+                else:
+                    # occupied: if it's an enemy, capture it; then stop
+                    if self.board[end_row][end_col][0] == enemy:
+                        moves.append(Move((r, c), (end_row, end_col), self.board))
+                    # whether enemy or ally, we cannot jump past it
+                    break
+
 
     def getKnightMoves(self, r, c, moves):
         pass
-
     def getBishopMoves(self, r, c, moves):
         pass   
     def getQueenMoves(self, r, c, moves):

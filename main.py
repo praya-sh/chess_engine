@@ -58,9 +58,9 @@ def main():
                     gs.undoMove()
                     moveMade = True
 
-        if moveMade:
-            validMoves = gs.getValidMoves()
-            moveMade = False
+            if moveMade:
+                validMoves = gs.getValidMoves()
+                moveMade = False
 
         drawGameState(screen,gs)
         clock.tick(max_fps)
