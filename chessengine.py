@@ -18,6 +18,9 @@ class GameState():
         # self.castleRights = True
         self.whiteKingLocation = (7, 4)
         self.blackKingLocation = (0, 4)
+        self.checkMate = False
+        self.staleMate = False
+
 
     def makeMove(self, move):
         self.board[move.startRow][move.startCol] = "--"
@@ -60,6 +63,15 @@ class GameState():
                 moves.remove(moves[i])
             self.whiteToMove = not self.whiteToMove #to counteract the undomove which also switches turns
             self.undoMove()
+        
+        if len(moves) == 0:
+            if self.incheck():
+                self.checkMate = True
+            else:
+                self.staleMate = True
+        else:       #for when we undo moves after checkmate or stalemate
+            self.checkMate = False
+            self.staleMate = False
 
         return moves
     
