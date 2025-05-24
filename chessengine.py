@@ -65,7 +65,7 @@ class GameState():
             self.undoMove()
         
         if len(moves) == 0:
-            if self.incheck():
+            if self.inCheck():
                 self.checkMate = True
             else:
                 self.staleMate = True
