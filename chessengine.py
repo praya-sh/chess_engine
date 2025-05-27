@@ -128,12 +128,12 @@ class GameState():
                 moves.append(Move((r,c), (r+1, c), self.board))
                 if r == 1 and self.board[r+2][c] == "--":
                     moves.append(Move((r,c), (r+2,c), self.board))
-                if c - 1>=0: 
-                    if self.board[r+1][c-1][0] == "w":
-                        moves.append(Move((r,c), (r+1,c-1), self.board))
-                if c +1<=7: 
-                    if self.board[r+1][c+1][0] == "w":
-                        moves.append(Move((r,c), (r+1,c+1), self.board))   
+            if c - 1>=0: 
+                if self.board[r+1][c-1][0] == "w":
+                    moves.append(Move((r,c), (r+1,c-1), self.board))
+            if c +1<=7: 
+                if self.board[r+1][c+1][0] == "w":
+                    moves.append(Move((r,c), (r+1,c+1), self.board))   
 
     def getRookMoves(self, r, c, moves):
 
