@@ -20,6 +20,10 @@ class GameState():
         self.blackKingLocation = (0, 4)
         self.checkMate = False
         self.staleMate = False
+        # self.inCheck = False
+        # self.pins = []
+        # self.checks = []
+
 
 
     def makeMove(self, move):
@@ -33,6 +37,9 @@ class GameState():
             self.whiteKingLocation = (move.endRow, move.endCol)
         if move.pieceMoved == 'bK':
             self.blackKingLocation = (move.endRow, move.endCol)
+
+        if move.isPawnPromotion:
+            self.board[move.endRow][move.endCol] = move.pieceMoved[0] +'Q'
 
     def undoMove(self):
         if len(self.movelog) != 0:
@@ -127,6 +134,7 @@ class GameState():
                 if c +1<=7: 
                     if self.board[r+1][c+1][0] == "w":
                         moves.append(Move((r,c), (r+1,c+1), self.board))   
+
     def getRookMoves(self, r, c, moves):
 
         if self.whiteToMove:
@@ -235,9 +243,12 @@ class GameState():
                     moves.append(Move((r, c), (end_row, end_col), self.board))
                 else:
                     # occupied: capture if enemy, then stop
-                    if end_piece[0] == enemy:
+                    if self.board[end_row][end_col][0] == enemy:
                         moves.append(Move((r, c), (end_row, end_col), self.board))
-                    break     
+                        break     
+                    if self.board[end_row][end_col][0] == ally:
+                        break
+
     def getKingMoves(self, r, c, moves):
         if self.whiteToMove:
             ally, enemy = 'w', 'b'
@@ -285,6 +296,9 @@ class Move():
         self.pieceMoved = board[self.startRow][self.startCol]
         self.pieceCaptured = board[self.endRow][self.endCol]
         self.moveID = self.startRow * 1000 + self.startCol *100 + self.endRow*10 + self.endCol
+        self.isPawnPromotion = False
+        if (self.pieceMoved == 'wp' and self.endRow == 0) or (self.pieceMoved == 'bp' and self.endRow == 7):
+            self.isPawnPromotion = True
 
 
     def __eq__(self, other):
