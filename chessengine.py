@@ -20,6 +20,7 @@ class GameState():
         self.blackKingLocation = (0, 4)
         self.checkMate = False
         self.staleMate = False
+        self.enpassantPossible = () #sqauares where enpassant is possible
         # self.inCheck = False
         # self.pins = []
         # self.checks = []
@@ -288,7 +289,7 @@ class Move():
     
     colsToFiles = {v: k for k, v in filesToCols.items()}
 
-    def __init__(self, startSq, endSq, board):
+    def __init__(self, startSq, endSq, board, enpassantPossible = ()):
         self.startRow = startSq[0]
         self.startCol = startSq[1]
         self.endRow = endSq[0]
@@ -296,10 +297,14 @@ class Move():
         self.pieceMoved = board[self.startRow][self.startCol]
         self.pieceCaptured = board[self.endRow][self.endCol]
         self.moveID = self.startRow * 1000 + self.startCol *100 + self.endRow*10 + self.endCol
+        
         self.isPawnPromotion = False
         if (self.pieceMoved == 'wp' and self.endRow == 0) or (self.pieceMoved == 'bp' and self.endRow == 7):
             self.isPawnPromotion = True
 
+        self.isEnpassantMove = False
+        if self.pieceMoved[1] == 'p' and (self.endRow, self.endCol) == enpassantPossible:
+            self.isEnpassantMove = True
 
     def __eq__(self, other):
         if isinstance(other, Move):
