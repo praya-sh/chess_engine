@@ -65,13 +65,30 @@ def main():
                 validMoves = gs.getValidMoves()
                 moveMade = False
 
-        drawGameState(screen,gs)
+        drawGameState(screen,gs, validMoves, sqSelected)
         clock.tick(max_fps)
         p.display.flip()
 
-def drawGameState(screen,gs):
+def highlightSquares(screen, gs, validMoves, sqSelected):
+    if sqSelected != ():
+        r, c = sqSelected
+        if gs.board[r][c][0] == ('w' if gs.whiteToMove else 'b'): #sq selected is a piece that can be moved
+            s = p.Surface((SQ_SIZE, SQ_SIZE))
+            s.set_alpha(100)#transparency value: 0 transparen 255 opaque
+            s.fill(p.Color('green'))
+            screen.blit(s, (c*SQ_SIZE, r*SQ_SIZE))
+            
+            #highlight validmoves
+            s.fill(p.Color('green'))
+            for move in validMoves:
+                if move.startRow == r and move.startCol == c:
+                    screen.blit(s, (move.endCol*SQ_SIZE, move.endRow*SQ_SIZE))
+
+def drawGameState(screen,gs, validMoves, sqSelected):
     drawBoard(screen)
+    highlightSquares(screen, gs, validMoves, sqSelected)
     drawPieces(screen,gs.board)
+
 
 def drawBoard(screen):
     colors = [p.Color('white'), p.Color("gray")]
