@@ -33,8 +33,8 @@ def main():
 
     gameOver = False
 
-    playerOne = False #if human playing white: true and if AI playing white false
-    playerTwo = False #same but for black
+    playerOne = True #if human playing white: true and if AI playing white false
+    playerTwo = True #same but for black
 
     while running:
         humanTurn = (gs.whiteToMove and playerOne) or (not gs.whiteToMove and playerTwo)
@@ -80,17 +80,17 @@ def main():
                     animate = False
 
             #AI move finder
-            if not gameOver and not humanTurn:
-                AIMove = chessai.findRandomMove(validMoves)
-                gs.makeMove(AIMove)
-                moveMade = True
-                animate = True
+        if not gameOver and not humanTurn:
+            AIMove = chessai.findRandomMove(validMoves)
+            gs.makeMove(AIMove)
+            moveMade = True
+            animate = True
 
-            if moveMade:
-                if animate:
-                    animateMove(gs.movelog[-1], screen, gs.board, clock)
-                validMoves = gs.getValidMoves()
-                moveMade = False
+        if moveMade:
+            if animate:
+                animateMove(gs.movelog[-1], screen, gs.board, clock)
+            validMoves = gs.getValidMoves()
+            moveMade = False
 
 
         drawGameState(screen,gs, validMoves, sqSelected)
@@ -149,24 +149,43 @@ def drawPieces(screen, board):
 
 def animateMove(move, screen, board, clock):
     global colors
-    
     dR = move.endRow - move.startRow
     dC = move.endCol - move.startCol
-    framesPerSquare = 1
+    framesPerSquare = 15  # Increase frames for smoother animation
     frameCount = (abs(dR) + abs(dC)) * framesPerSquare
-    for frame in range(frameCount + 1):
-        r,c = (move.startRow + dR* frame/frameCount, move.startCol + dC*frame/frameCount)
-        drawBoard(screen)
-        drawPieces(screen, board)
-        color = colors[(move.endRow + move.endCol) % 2]
-        endSquare = p.Rect(move.endCol*SQ_SIZE, move.endRow*SQ_SIZE, SQ_SIZE, SQ_SIZE)
-        p.draw.rect(screen, color, endSquare)
-        if move.pieceCaptured != '--':
-            screen.blit(images[move.pieceCaptured], endSquare)
     
-    screen.blit(images[move.pieceMoved], p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE))
-    p.display.flip()
-    clock.tick(60)
+    # Create a copy of the board for animation
+    anim_board = [row[:] for row in board]
+    # Remove moving piece from start position
+    anim_board[move.startRow][move.startCol] = "--"
+    
+    for frame in range(frameCount + 1):
+        # Calculate intermediate position
+        progress = frame / frameCount
+        r = move.startRow + dR * progress
+        c = move.startCol + dC * progress
+        
+        # Draw the board
+        drawBoard(screen)
+        
+        # Draw all pieces except moving piece
+        for row in range(Dimension):
+            for col in range(Dimension):
+                piece = anim_board[row][col]
+                if piece != "--" and (row, col) != (move.endRow, move.endCol):
+                    screen.blit(images[piece], p.Rect(col * SQ_SIZE, row * SQ_SIZE, SQ_SIZE, SQ_SIZE))
+        
+        # Draw captured piece if any
+        if move.pieceCaptured != "--" and frame == 0:
+            screen.blit(images[move.pieceCaptured], 
+                        p.Rect(move.endCol * SQ_SIZE, move.endRow * SQ_SIZE, SQ_SIZE, SQ_SIZE))
+        
+        # Draw moving piece at intermediate position
+        screen.blit(images[move.pieceMoved], 
+                    p.Rect(int(c * SQ_SIZE), int(r * SQ_SIZE), SQ_SIZE, SQ_SIZE))
+        
+        p.display.flip()
+        clock.tick(60)
 
 def drawText(screen, text):
     font = p.font.SysFont("Helvitica", 32, True, False)
