@@ -1,5 +1,6 @@
 import pygame as p
 import chessengine
+import chessai
 
 width = height = 512
 Dimension = 8
@@ -32,12 +33,16 @@ def main():
 
     gameOver = False
 
+    playerOne = False #if human playing white: true and if AI playing white false
+    playerTwo = False #same but for black
+
     while running:
+        humanTurn = (gs.whiteToMove and playerOne) or (not gs.whiteToMove and playerTwo)
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
             elif e.type == p.MOUSEBUTTONDOWN:
-                if not gameOver:
+                if not gameOver and humanTurn:
                     location = p.mouse.get_pos()
                     #print(location)
                     col = location[0]//SQ_SIZE
@@ -73,7 +78,13 @@ def main():
                     playerClicks = []
                     moveMade = False
                     animate = False
-        
+
+            #AI move finder
+            if not gameOver and not humanTurn:
+                AIMove = chessai.findRandomMove(validMoves)
+                gs.makeMove(AIMove)
+                moveMade = True
+                animate = True
 
             if moveMade:
                 if animate:
