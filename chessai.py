@@ -10,31 +10,40 @@ def findRandomMove(validMoves):
 def findBestMove(gs, validMoves):
     turnMultiplier = 1 if gs.whiteToMove else -1
 
-    maxScore = -CHECKMATE
-    bestMove = None
+    opponentMinMaxScore = CHECKMATE
+    bestPlayerMove = None
+    random.shuffle(validMoves)
     for playerMove in validMoves:
         gs.makeMove(playerMove)
-        if gs.checkMate:
-            score = CHECKMATE
-        elif gs.staleMate:
-            score = STALEMATE
-        else:
-            score = turnMultiplier * scoreMaterial(gs.board)
-        if (score > maxScore):
-            score = maxScore
-            bestMove = playerMove
+        opponentsMoves = gs.getValidMoves()
+        
+        opponentMaxScore = -CHECKMATE
+        for opponentsMove in opponentsMoves:
+            gs.makeMove(opponentsMove)
+            if gs.checkMate:
+                score = -turnMultiplier * CHECKMATE
+            elif gs.staleMate:
+                score = STALEMATE
+            else:
+                score = -turnMultiplier * scoreMaterial(gs.board)
+            if score > opponentMaxScore:
+                opponentMaxScore = score
+            gs.undoMove()
+        if opponentMaxScore < opponentMinMaxScore:
+            opponentMinMaxScore = opponentMaxScore
+            bestPlayerMove = playerMove
         gs.undoMove()
-    return bestMove
+    return bestPlayerMove
 
 #score based on material
 
 def scoreMaterial(board):
     score = 0
     for row in board:
-        for square in board:
-                if square[0] == 'w':
-                    score += pieceScore[square[1]]
-                elif square[0] == 'b':
-                     score -= pieceScore[square[1]]
+        for square in row:
+            if square[0] == 'w':
+                score += pieceScore[square[1]]
+            elif square[0] == 'b':
+                score -= pieceScore[square[1]]
     return score
 
