@@ -8,44 +8,45 @@ DEPTH = 2
 def findRandomMove(validMoves):
     return validMoves[random.randint(0, len(validMoves) - 1)]
 
-def findBestMove(gs, validMoves):
-    turnMultiplier = 1 if gs.whiteToMove else -1
+# def findBestMove(gs, validMoves):
+#     turnMultiplier = 1 if gs.whiteToMove else -1
 
-    opponentMinMaxScore = CHECKMATE
-    bestPlayerMove = None
-    random.shuffle(validMoves)
-    for playerMove in validMoves:
-        gs.makeMove(playerMove)
-        opponentsMoves = gs.getValidMoves()
-        if gs.staleMate:
-            opponentMaxScore = STALEMATE
-        elif gs.checkMate:
-            opponentMaxScore = -CHECKMATE
-        else:
-            opponentMaxScore = -CHECKMATE
-            for opponentsMove in opponentsMoves:
-                gs.makeMove(opponentsMove)
-                gs.getValidMoves()
-                if gs.checkMate:
-                    score = CHECKMATE
-                elif gs.staleMate:
-                    score = STALEMATE
-                else:
-                    score = -turnMultiplier * scoreMaterial(gs.board)
-                if score > opponentMaxScore:
-                    opponentMaxScore = score
-                gs.undoMove()
-            if opponentMaxScore < opponentMinMaxScore:
-                opponentMinMaxScore = opponentMaxScore
-                bestPlayerMove = playerMove
-            gs.undoMove()
-    return bestPlayerMove
+#     opponentMinMaxScore = CHECKMATE
+#     bestPlayerMove = None
+#     random.shuffle(validMoves)
+#     for playerMove in validMoves:
+#         gs.makeMove(playerMove)
+#         opponentsMoves = gs.getValidMoves()
+#         if gs.staleMate:
+#             opponentMaxScore = STALEMATE
+#         elif gs.checkMate:
+#             opponentMaxScore = -CHECKMATE
+#         else:
+#             opponentMaxScore = -CHECKMATE
+#             for opponentsMove in opponentsMoves:
+#                 gs.makeMove(opponentsMove)
+#                 gs.getValidMoves()
+#                 if gs.checkMate:
+#                     score = CHECKMATE
+#                 elif gs.staleMate:
+#                     score = STALEMATE
+#                 else:
+#                     score = -turnMultiplier * scoreMaterial(gs.board)
+#                 if score > opponentMaxScore:
+#                     opponentMaxScore = score
+#                 gs.undoMove()
+#             if opponentMaxScore < opponentMinMaxScore:
+#                 opponentMinMaxScore = opponentMaxScore
+#                 bestPlayerMove = playerMove
+#             gs.undoMove()
+#     return bestPlayerMove
 
 #helper to make first recursive call
-def findBestMoveMinMax(gs, validMoves):
+def findBestMove(gs, validMoves):
     global nextMove
     nextMove = None
-    findMoveMinMax(gs, validMoves, DEPTH, gs.whiteToMove)
+    #findMoveMinMax(gs, validMoves, DEPTH, gs.whiteToMove)
+    findMoveNegaMax(gs, validMoves, DEPTH, 1 if gs.whiteToMove else -1)
     return nextMove
 
 def findMoveMinMax(gs, validMoves, depth, whiteToMove):
@@ -53,10 +54,11 @@ def findMoveMinMax(gs, validMoves, depth, whiteToMove):
     if depth == 0:
         return scoreMaterial(gs.board)
     
+    random.shuffle(validMoves)
     if whiteToMove:
         maxScore = -CHECKMATE
         for move in validMoves:
-            gs.makeMove()
+            gs.makeMove(move)
             nextMoves = gs.getValidMoves()
             score = findMoveMinMax(gs, nextMoves, depth - 1, False)
             if score>maxScore:
@@ -69,7 +71,7 @@ def findMoveMinMax(gs, validMoves, depth, whiteToMove):
     else:
         minScore = CHECKMATE
         for move in validMoves:
-            gs.makeMove()
+            gs.makeMove(move)
             nextMoves = gs.getValidMoves()
             score = findMoveMinMax(gs, nextMoves, depth - 1, True)
             if score < minScore:
@@ -79,7 +81,43 @@ def findMoveMinMax(gs, validMoves, depth, whiteToMove):
             gs.undoMove()
         return minScore
 
+def findMoveNegaMax(gs, validMoves, depth, turnMultiplier):
+    global nextMove
+    if depth == 0:
+        return turnMultiplier * scoreBoard(gs)
+    
+    random.shuffle(validMoves)
+    maxScore = -CHECKMATE
+    for move in validMoves:
+        gs.makeMove(move)
+        nextMoves = gs.getValidMoves()
+        score = -findMoveNegaMax(gs, nextMoves, depth - 1, -turnMultiplier)
+        if score > maxScore:
+            maxScore = score
+            if depth == DEPTH:
+                nextMove = move
 
+        gs.undoMove()
+    return maxScore
+
+def findMoveNegaMaxAlphaBeta(gs, validMoves, depth, turnMultiplier):
+    global nextMove
+    if depth == 0:
+        return turnMultiplier * scoreBoard(gs)
+    
+    random.shuffle(validMoves)
+    maxScore = -CHECKMATE
+    for move in validMoves:
+        gs.makeMove(move)
+        nextMoves = gs.getValidMoves()
+        score = -findMoveNegaMax(gs, nextMoves, depth - 1, -turnMultiplier)
+        if score > maxScore:
+            maxScore = score
+            if depth == DEPTH:
+                nextMove = move
+
+        gs.undoMove()
+    return maxScore
 
 
 def scoreBoard(gs, ):
