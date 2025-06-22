@@ -33,7 +33,7 @@ def main():
 
     gameOver = False
 
-    playerOne = False #if human playing white: true and if AI playing white false
+    playerOne = True #if human playing white: true and if AI playing white false
     playerTwo = True #same but for black
 
     while running:
