@@ -38,7 +38,7 @@ def main():
     playerOne = True #if human playing white: true and if AI playing white false
     playerTwo = True #same but for black
 
-    moveLogFont = p.font.SysFont("Arial ", 12, False, False)
+    moveLogFont = p.font.SysFont("Arial ", 14, False, False)
 
     while running:
         humanTurn = (gs.whiteToMove and playerOne) or (not gs.whiteToMove and playerTwo)
@@ -162,15 +162,20 @@ def drawMoveLog(screen, gs, font):
     moveLog = gs.movelog
     moveTexts = []
     for i in range(0, len(moveLog), 2):
-        moveString = str(i//2 + 1) + ". " + moveLog[i].getChessNotation() +" "
+        moveString = str(i//2 + 1) + ". " + str(moveLog[i]) +" "
         if i+1 < len(moveLog):
-            moveString += moveLog[i+1].getChessNotation()
+            moveString += str(moveLog[i+1]) + "  "
         moveTexts.append(moveString)
+
+    movesPerRow = 3
     padding = 5
     lineSpacing = 2
     textY = padding
-    for i in range(len(moveTexts)):
-        text = moveTexts[i]
+    for i in range(0, len(moveTexts), movesPerRow):
+        text = ""
+        for j in range(movesPerRow):
+            if i + j < len(moveTexts):
+                text += moveTexts[i+j]
         textObject = font.render(text, True, p.Color('White'))
         textLocation  = moveLogRect.move(padding, textY)
         screen.blit(textObject, textLocation)
