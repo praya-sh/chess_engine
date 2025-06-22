@@ -33,8 +33,8 @@ def main():
 
     gameOver = False
 
-    playerOne = True #if human playing white: true and if AI playing white false
-    playerTwo = False #same but for black
+    playerOne = False #if human playing white: true and if AI playing white false
+    playerTwo = True #same but for black
 
     while running:
         humanTurn = (gs.whiteToMove and playerOne) or (not gs.whiteToMove and playerTwo)
@@ -55,7 +55,7 @@ def main():
                         playerClicks.append(sqSelected) #append for first and second clicks
                     if len(playerClicks) == 2:
                         move = chessengine.Move(playerClicks[0], playerClicks[1], gs.board)
-                        #print(move.getChessNotation())
+                        print(move.getChessNotation())
                         for i in range(len(validMoves)):
                             if move == validMoves[i]:
                                 gs.makeMove(validMoves[i])   
