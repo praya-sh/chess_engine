@@ -23,6 +23,7 @@ class GameState():
         self.checkMate = False
         self.staleMate = False
         self.enpassantPossible = () #sqauares where enpassant is possible
+        self.enpassantPossibleLog = [self.enpassantPossible]
         self.currentCastlingRights = CastleRights(True, True, True, True)
         self.castleRightsLog = [CastleRights(self.currentCastlingRights.wks, self.currentCastlingRights.bks, 
                                              self.currentCastlingRights.wqs, self.currentCastlingRights.bqs)]
@@ -63,6 +64,7 @@ class GameState():
                 self.board[move.endRow][move.endCol + 1] = self.board[move.endRow][move.endCol - 2]
                 self.board[move.endRow][move.endCol - 2] = '--'
 
+        self.enpassantPossibleLog.append(self.enpassantPossible)
 
         #update castling rights
         self.updateCastleRights(move)
@@ -86,11 +88,10 @@ class GameState():
             if move.isEnpassantMove:
                 self.board[move.endRow][move.endCol] = '--'
                 self.board[move.startRow][move.endCol] = move.pieceCaptured
-                self.enpassantPossible = (move.endRow, move.endCol)
+                
 
-            #undo a 2 square advance
-            if move.pieceMoved[1] == 'p' and abs(move.startRow - move.endRow) == 2:
-                self.enpassantPossible = ()
+            self.enpassantPossibleLog.pop()
+            self.enpassantPossible = self.enpassantPossibleLog[-1]
 
             #undo castling rights
             self.castleRightsLog.pop()
